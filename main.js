@@ -1,6 +1,17 @@
 const defaultText = `require 'lib'
 local Node = include("gravyui/node")
 local x, y = getResolution()
+local w, h = 300, 300
+
+local window = Node(w, h):offset(x/2 - w/2, y/2 - h/2)
+local left, right = window:cols(2, 40)
+
+Display(window, "red")
+Display(left, "green")
+Display(right, "blue")
+
+-- Add more nodes yourself!
+
 `;
 
 require.config({ paths: { 

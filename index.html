@@ -6,21 +6,22 @@
     <body>
         <table id="layout">
             <tr>
-                <td style="width: 50%">
+                <td style="width: 50%" rowspan="3">
                     <div id="input"></div>
                 </td>
-                <td rowspan="3">
+                <td>
                     <canvas id="render"></canvas>
                 </td>
             </tr>
             <tr>
-                <td style="width: 30px;">
+                <td style="height: 30px;">
                     <select id="selector">
                         <option value=""></option>
                         <option value="orderbook.lua">OrderBook</option>
                         <option value="windmill.lua">Windmill</option>
                         <option value="dialog.lua">Dialog</option>
                         <option value="extending.lua">Extending</option>
+                        <option value="face.lua">Face</option>
                     </select>
                 </td>
             </tr>
@@ -30,8 +31,9 @@
                     <p>
                         This tool can assist you in developing
                         a layout using GravyUI. You can choose
-                        from the dropdown at the top of examples,
-                        or write your own.
+                        from the dropdown of examples, or write
+                        your own. Everything is rendered as you
+                        type!
                     </p>
                     <p>Made by Kevin Gravier (Gravy) in 2020 under the MIT license with love ♥</p>
                 </td>
