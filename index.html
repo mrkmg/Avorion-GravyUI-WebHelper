@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="./main.css" />
+    </head>
+    <body>
+        <table id="layout">
+            <tr>
+                <td style="width: 50%; height: 30px">
+                    <select id="selector">
+                        <option value=""></option>
+                        <option value="orderbook.lua">OrderBook</option>
+                        <option value="windmill.lua">Windmill</option>
+                        <option value="dialog.lua">Dialog</option>
+                        <option value="extending.lua">Extending</option>
+                    </select>
+                </td>
+                <td rowspan="3">
+                    <canvas id="render"></canvas>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div id="input"></div>
+                </td>
+            </tr>
+            <tr style="height: 100px">
+                <td>
+                    <h3>GravyUI Assister</h3>
+                    <p>
+                        This tool can assist you in developing
+                        a layout using GravyUI. You can choose
+                        from the dropdown at the top of examples,
+                        or write your own.
+                    </p>
+
+                    <p>
+                        Your code is executed as you type.
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <script src="./fengari-web.js" type="text/javascript"></script>
+        <script src="./monaco/min/vs/loader.js" type="text/javascript"></script>
+        <script src="./main.js" type="text/javascript"></script>
+    </body>
+</html>
