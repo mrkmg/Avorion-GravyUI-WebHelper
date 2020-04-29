@@ -1,4 +1,4 @@
-const defaultText = `require 'lib'
+let defaultText = `require 'lib'
 local Node = include("gravyui/node")
 local x, y = getResolution()
 local w, h = 300, 300
@@ -14,31 +14,73 @@ Display(right, "blue")
 
 `;
 
+if ("localStorage" in window ) {
+    const saved = localStorage.getItem("Saved Text")
+    if (saved != "") {
+        defaultText = saved;
+    }
+}
+
 require.config({ paths: { 
     'vs': './monaco/min/vs'
  }});
 
 let editor;
 require(['vs/editor/editor.main'], function() {
+    const renderEle = document.getElementById("render")
+    const selector = document.getElementById("selector")
+    const renderCtx = renderEle.getContext("2d");
+    const dragger = document.getElementById("dragger")
+    const leftCol = document.getElementById("leftCol")
+    const rightCol = document.getElementById("rightCol")
+
+    // Draggerbar
+    let leftWidth = window.innerWidth / 2;
+    leftCol.width = leftWidth;
+
+    let draggerDownX = null;
+    dragger.addEventListener("mousedown", (e) => {
+        draggerDownX = e.x;
+        editor.getDomNode().hidden = true;
+    });
+
+    window.addEventListener("mousemove", (e) => {
+        if (draggerDownX === null) return;
+        leftCol.width = leftWidth + e.x - draggerDownX
+    });
+
+    window.addEventListener("mouseup", () => {
+        if (draggerDownX === null) return;
+
+        draggerDownX = null;
+        leftWidth = leftCol.clientWidth;
+        
+        editor.layout();
+        editor.getDomNode().hidden = false;
+        runLua();
+    })
+
+
     editor = monaco.editor.create(document.getElementById('input'), {
         value: defaultText,
         language: 'lua'
     });
 
-    const renderEle = document.getElementById("render")
-    const selector = document.getElementById("selector")
-    const renderCtx = renderEle.getContext("2d");
     const lua = fengari.lua;
 
     renderCtx.imagesSmoothingEnabled = false
-    renderEle.width = renderEle.parentElement.clientWidth;
-    renderEle.height = renderEle.parentElement.clientHeight - 2;
 
     let lastPrintOffset = 0;
 
     function runLua() {
+        renderEle.width = renderEle.parentElement.clientWidth;
+        renderEle.height = renderEle.parentElement.clientHeight - 10;
         const L = fengari.lauxlib.luaL_newstate();
-        const luaCode = fengari.to_luastring(editor.getValue());
+        const value = editor.getValue();
+        if ("localStorage" in window ) {
+            localStorage.setItem("Saved Text", value)
+        }        
+        const luaCode = fengari.to_luastring(value);
 
         fengari.lualib.luaL_openlibs(L);
         lua.lua_register(L, "Display", Display);
@@ -159,7 +201,7 @@ require(['vs/editor/editor.main'], function() {
         renderEle.height = renderEle.parentElement.clientHeight - 2;
         editor.layout();
         runLua()
-    })
+    });
 
 
     const cachedNames = [

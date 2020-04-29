@@ -6,10 +6,13 @@
     <body>
         <table id="layout">
             <tr>
-                <td style="width: 50%; height: 100%;" rowspan="3">
-                    <div id="input"></div>
+                <td id="leftCol" style="height: 100%;" rowspan="3">
+                    <div class="allower">
+                        <div id="input"></div>
+                    </div>
                 </td>
-                <td>
+                <td id="dragger" rowspan="3"></td>
+                <td id="rightCol" >
                     <canvas id="render"></canvas>
                 </td>
             </tr>
@@ -25,15 +28,16 @@
                     </select>
                 </td>
             </tr>
-            <tr style="height: 100px">
-                <td>
+            <tr>
+                <td style="height: 100px">
                     <h3>GravyUI - Playground</h3>
                     <p>
                         This tool can assist you in developing
                         a layout using GravyUI. You can choose
                         from the dropdown of examples, or write
                         your own. Everything is rendered as you
-                        type!
+                        type! Docs for how to use GravyUI are at:
+                        <a href="https://github.com/mrkmg/AvorionMods/tree/master/GravyUI">GitHub</a>
                     </p>
                     <p>Made by Kevin Gravier (Gravy) in 2020 under the MIT license with love ♥</p>
                 </td>
