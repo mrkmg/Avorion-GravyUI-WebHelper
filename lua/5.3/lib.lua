@@ -3,7 +3,8 @@ function Rect(v1, v2)
         topLeft = v1,
         bottomRight = v2,
         width = v2.x - v1.x,
-        height = v2.y - v1.y
+        height = v2.y - v1.y,
+        center = vec2(v1.x + (v2.x - v1.x)/2, v1.y + (v2.y - v1.y)/2)
     }
 end
 
@@ -38,4 +39,9 @@ function round(num, idp)
     else return math.ceil(num * mult - 0.5) / mult end
 end
 
-_G.unpack = table.unpack
+function unpack(t, i)
+    i = i or 1
+    if t[i] ~= nil then
+      return t[i], unpack(t, i + 1)
+    end
+  end

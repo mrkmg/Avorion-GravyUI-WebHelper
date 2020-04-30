@@ -1,12 +1,15 @@
 require 'lib'
 local Node = include("gravyui/node")
 local x, y = getResolution()
+
+--[[
+    A fun little example of outside
+    the box thinking.
+]]
+
 local w, h = 200, 200
-
-local face = Node(200, 200):offset(x/2 - w/2, y/2 - h/2)
-
+local face = Node(w, h):offset(x/2 - w/2, y/2 - h/2)
 local eyes, nose, mouth = face:pad(20, 40):rows({1/6, 2/3, 1/6}, 10)
-
 eyes = {eyes:pad(1/8, 0):cols(2, 1/2)}
 nose = nose:pad(2/5, 10)
 mouthRows = {mouth:rows({1/4,1/2,1/4})}

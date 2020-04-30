@@ -1,18 +1,4 @@
-let defaultText = `require 'lib'
-local Node = include("gravyui/node")
-local x, y = getResolution()
-local w, h = 300, 300
-
-local window = Node(w, h):offset(x/2 - w/2, y/2 - h/2)
-local left, right = window:cols(2, 40)
-
-Display(window, "red")
-Display(left, "green")
-Display(right, "blue")
-
--- Add more nodes yourself!
-
-`;
+let defaultText = "";
 
 if ("localStorage" in window ) {
     const saved = localStorage.getItem("Saved Text")
@@ -35,7 +21,7 @@ require(['vs/editor/editor.main'], function() {
     const rightCol = document.getElementById("rightCol")
 
     // Draggerbar
-    let leftWidth = window.innerWidth / 2;
+    let leftWidth = Math.min(800, window.innerWidth / 2);
     leftCol.width = leftWidth;
 
     let draggerDownX = null;
@@ -63,6 +49,7 @@ require(['vs/editor/editor.main'], function() {
 
     editor = monaco.editor.create(document.getElementById('input'), {
         value: defaultText,
+        minimap: {enabled: false},
         language: 'lua'
     });
 
@@ -161,7 +148,6 @@ require(['vs/editor/editor.main'], function() {
         const y2 = lua.lua_tonumber(L, -1)
         lua.lua_pop(L, 2)
 
-        console.log("Rendering", x1, x2, y1, y2)
         renderCtx.fillStyle = fillColor;
         renderCtx.strokeStyle = strokeColor;
         renderCtx.lineWidth = "1"
@@ -223,6 +209,11 @@ require(['vs/editor/editor.main'], function() {
 
     Promise.all(promises)
     .then(function () {
+        if (!defaultText) {
+            selector.value = "showcase.lua"
+            loadScript("showcase.lua")
+        }
+
         runLua()
     });
 
