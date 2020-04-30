@@ -71,7 +71,6 @@ require(['vs/editor/editor.main'], function() {
         const luaCode = fengari.to_luastring(value);
 
         fengari.lualib.luaL_openlibs(L);
-        lua.lua_register(L, "Display", Display);
         lua.lua_register(L, "getResolution", getResolution);
         lua.lua_register(L, "sprint", sprint);
         lua.lua_register(L, "DrawText", DrawText);
@@ -155,51 +154,6 @@ require(['vs/editor/editor.main'], function() {
         return {x1: x1, y1: y1, x2: x2, y2: y2}
     }
 
-    function Display(L) {
-        let fillColor = null;
-        let pos = null;
-        let fillText = null;
-
-        while (lua.lua_gettop(L) > 0) {
-            if (pos === null && lua.lua_istable(L, -1)) {
-                pos = processDisplayTable(L);
-                lua.lua_pop(L, 1)
-                continue;
-            }
-
-            if (pos === null && lua.lua_isstring(L, -1)) {
-                fillColor = lua.lua_tojsstring(L, -1);
-                lua.lua_pop(L, 1);
-                continue;
-            }
-
-            if (pos !== null && lua.lua_isstring(L, -1)) {
-                fillText = lua.lua_tojsstring(L, -1);
-                lua.lua_pop(L, 1);
-                continue;
-            }
-
-            throw new Error("unknown param");
-        }
-
-        if (fillColor === "null") fillColor = "white";
-
-        renderCtx.fillStyle = fillColor;
-        renderCtx.strokeStyle = "black";
-        renderCtx.lineWidth = "1"
-        let w = pos.x2 - pos.x1;
-        let h = pos.y2 - pos.y1
-        renderCtx.fillRect(pos.x1, pos.y1, w, h);
-        renderCtx.strokeRect(pos.x1, pos.y1, w, h);
-        if (fillText !== null) {
-            renderCtx.fillStyle = "black";
-            renderCtx.font = "20px Arial";
-            renderCtx.fillText(fillText, pos.x1 + 5, pos.y1 + h/2 + 5, w - 10);
-        }
-
-        return 0
-    }
-
     function DrawRect(L) {
         let color = null;
         if (lua.lua_gettop(L) == 2) {
@@ -238,27 +192,26 @@ require(['vs/editor/editor.main'], function() {
             }
         }
         if (color === null) color = globalFontColor;
-        if (size === null) size = 14;
+        if (size === null) size = 20;
         const text = lua.lua_tojsstring(L, -1)
         lua.lua_pop(L, 1)
         const pos = processDisplayTable(L)
         lua.lua_pop(L, 1)
-        const w = pos.x2 - pos.x1;
-        const h = pos.y2 - pos.y1
+        const rectWidth = pos.x2 - pos.x1;
+        const rectHeight = pos.y2 - pos.y1
         renderCtx.fillStyle = color;
-        renderCtx.font = "600 " + size.toString() + "px 'Open Sans'";
-        let mWidth = renderCtx.measureText(text).width
-        if (size > h) {
-            size *= h / size;
+        if ((size * 1.5) > rectHeight) {
+            size *= rectHeight / (size * 1.5);
         }
-        if (mWidth > w) {
-            const ratio = w/mWidth;
-            size *= ratio;
-        }
+        let textWidth;
+        do {
+            renderCtx.font = "600 " + size.toString() + "px 'Open Sans'";
+            textWidth = renderCtx.measureText(text).width
+        } while (textWidth > rectWidth && --size)
         renderCtx.font = "600 " + size.toString() + "px 'Open Sans'";
         mWidth = renderCtx.measureText(text).width
-        const lOffset = left ? 0 : (w/2 - mWidth/2)
-        renderCtx.fillText(text, pos.x1 + lOffset, pos.y1 + h/2 + size*.4);
+        const lOffset = left ? 0 : (rectWidth/2 - mWidth/2)
+        renderCtx.fillText(text, pos.x1 + lOffset, pos.y1 + rectHeight/2 + size * .35);
         return 0;
     }
 

@@ -79,7 +79,11 @@ function main()
     DrawText(top[2][2], "Write Book")
 
     for i=1,pageSize do
-        DrawTextL(chainTable[i][1], "[" .. i .. "] Order")
+        local orderName = "[" .. i .. "] Order";
+        for ii=1,i-1 do
+            orderName = orderName .. " Test"
+        end
+        DrawTextL(chainTable[i][1], orderName)
         DrawRect(chainTable[i][2], inputColor)
         DrawText(chainTable[i][2], "✔")
         DrawRect(chainTable[i][3], buttonColor)
