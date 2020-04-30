@@ -266,8 +266,8 @@ require(['vs/editor/editor.main'], function() {
     Promise.all(promises)
     .then(function () {
         if (!defaultText) {
-            selector.value = "showcase.lua"
-            loadScript("showcase.lua")
+            selector.value = "orderbook.lua"
+            loadScript("orderbook.lua")
         }
 
         runLua()
