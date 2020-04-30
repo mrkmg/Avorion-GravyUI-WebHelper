@@ -10,32 +10,22 @@ GravyUINode = {
 }
 GravyUINode.__index = GravyUINode
 
-function GravyUINode:new(rect)
-    obj = {rect = rect, children = {}}
-    setmetatable(obj, GravyUINode)
-    return obj
+local function new(width, height)
+    if height ~= nil then
+        width = Rect(vec2(0, 0), vec2(width, height))
+    end
+    return setmetatable({rect = width, children = {}}, GravyUINode)
 end
 
 function GravyUINode:child(rect)
-    local child = self:new(rect)
+    local child = new(rect)
     child.parentNode = self
     table.insert(self.childNodes, child)
     return child
 end
 
-GravyUINode.rows = include("gravyui/plugins/rows")
-GravyUINode.cols = include("gravyui/plugins/cols")
-GravyUINode.pad = include("gravyui/plugins/pad")
-GravyUINode.grid = include("gravyui/plugins/grid")
-GravyUINode.offset = include("gravyui/plugins/offset")
+include("gravyui/plugins/resizing")
+include("gravyui/plugins/translating")
+include("gravyui/plugins/splitting")
 
---[[
-    (width: number, height: number)
-    (box: Rect)
-]]
-return function(a, b)
-    if b ~= nil then
-        a = Rect(vec2(0, 0), vec2(a, b))
-    end
-    return GravyUINode:new(a)
-end
+return setmetatable({new = new}, {__call = function(_, ...) return new(...) end})

@@ -58,6 +58,7 @@ require(['vs/editor/editor.main'], function() {
     renderCtx.imagesSmoothingEnabled = false
 
     let lastPrintOffset = 0;
+    let globalFontColor = "black";
 
     function runLua() {
         renderEle.width = renderEle.parentElement.clientWidth;
@@ -73,13 +74,28 @@ require(['vs/editor/editor.main'], function() {
         lua.lua_register(L, "Display", Display);
         lua.lua_register(L, "getResolution", getResolution);
         lua.lua_register(L, "sprint", sprint);
+        lua.lua_register(L, "DrawText", DrawText);
+        lua.lua_register(L, "DrawTextL", DrawTextL);
+        lua.lua_register(L, "DrawRect", DrawRect);
 
         fengari.lauxlib.luaL_loadstring(L, luaCode)
 
         try {
             renderCtx.clearRect(0, 0, renderEle.width, renderEle.height);
             lastPrintOffset = 0;
+            globalFontColor = "black";
             lua.lua_call(L, 0, -1)
+            lua.lua_getglobal(L, "FONTCOLOR")
+            if (!lua.lua_isnil(L, -1)) {
+                globalFontColor = lua.lua_tojsstring(L, -1)
+                lua.lua_pop(L, 1)
+            }
+
+            lua.lua_getglobal(L, "main")
+            if (!lua.lua_isnil(L, -1)) {
+                lua.lua_call(L, 0, 0)
+            }
+            lua.lua_close(L)
         } catch (e) {
             renderCtx.clearRect(0, 0, renderEle.width, renderEle.height);
             renderCtx.fillStyle = 'red';
@@ -106,19 +122,7 @@ require(['vs/editor/editor.main'], function() {
         return 0
     }
 
-    function Display(L) {
-        let strokeColor = "#000000";
-        let fillColor = "#FFFFFF";
-
-        if (lua.lua_gettop(L) == 3) {
-            strokeColor = lua.lua_tojsstring(L, -1)
-            lua.lua_pop(L, 1)
-        }
-        if (lua.lua_gettop(L) == 2) {
-            fillColor = lua.lua_tojsstring(L, -1)
-            lua.lua_pop(L, 1)
-        }
-
+    function processDisplayTable(L) {
         lua.lua_pushliteral(L, "rect")
         lua.lua_gettable(L, -2)
 
@@ -146,15 +150,116 @@ require(['vs/editor/editor.main'], function() {
         lua.lua_pushliteral(L, "y")
         lua.lua_gettable(L, -2)
         const y2 = lua.lua_tonumber(L, -1)
-        lua.lua_pop(L, 2)
+        lua.lua_pop(L, 3)
+
+        return {x1: x1, y1: y1, x2: x2, y2: y2}
+    }
+
+    function Display(L) {
+        let fillColor = null;
+        let pos = null;
+        let fillText = null;
+
+        while (lua.lua_gettop(L) > 0) {
+            if (pos === null && lua.lua_istable(L, -1)) {
+                pos = processDisplayTable(L);
+                lua.lua_pop(L, 1)
+                continue;
+            }
+
+            if (pos === null && lua.lua_isstring(L, -1)) {
+                fillColor = lua.lua_tojsstring(L, -1);
+                lua.lua_pop(L, 1);
+                continue;
+            }
+
+            if (pos !== null && lua.lua_isstring(L, -1)) {
+                fillText = lua.lua_tojsstring(L, -1);
+                lua.lua_pop(L, 1);
+                continue;
+            }
+
+            throw new Error("unknown param");
+        }
+
+        if (fillColor === "null") fillColor = "white";
 
         renderCtx.fillStyle = fillColor;
-        renderCtx.strokeStyle = strokeColor;
+        renderCtx.strokeStyle = "black";
         renderCtx.lineWidth = "1"
-        renderCtx.fillRect(x1, y1, x2 - x1, y2 - y1);
-        renderCtx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+        let w = pos.x2 - pos.x1;
+        let h = pos.y2 - pos.y1
+        renderCtx.fillRect(pos.x1, pos.y1, w, h);
+        renderCtx.strokeRect(pos.x1, pos.y1, w, h);
+        if (fillText !== null) {
+            renderCtx.fillStyle = "black";
+            renderCtx.font = "20px Arial";
+            renderCtx.fillText(fillText, pos.x1 + 5, pos.y1 + h/2 + 5, w - 10);
+        }
 
         return 0
+    }
+
+    function DrawRect(L) {
+        let color = null;
+        if (lua.lua_gettop(L) == 2) {
+            color = lua.lua_tojsstring(L, -1)
+            lua.lua_pop(L, 1)
+        }
+        const pos = processDisplayTable(L)
+        renderCtx.strokeStyle = "black";
+        renderCtx.lineWidth = "1"
+        const w = pos.x2 - pos.x1;
+        const h = pos.y2 - pos.y1
+        if (color !== null) {
+            renderCtx.fillStyle = color;
+            renderCtx.fillRect(pos.x1, pos.y1, w, h);
+        }
+        renderCtx.strokeRect(pos.x1, pos.y1, w, h);
+        return 0;
+    }
+
+    function DrawTextL(L) {
+        return DrawText(L, true)
+    }
+
+    function DrawText(L, left) {
+        let color = null;
+        let size = null;
+        while (lua.lua_gettop(L) >= 3) {
+            if (lua.lua_isnumber(L, -1) && size === null) {
+                size = lua.lua_tonumber(L, -1)
+                lua.lua_pop(L, 1)
+            } else if (lua.lua_isstring(L, -1) && color === null) {
+                color = lua.lua_tojsstring(L, -1)
+                lua.lua_pop(L, 1)
+            } else {
+                throw new Error("Unexpected Argument");
+            }
+        }
+        if (color === null) color = globalFontColor;
+        if (size === null) size = 14;
+        const text = lua.lua_tojsstring(L, -1)
+        lua.lua_pop(L, 1)
+        const pos = processDisplayTable(L)
+        lua.lua_pop(L, 1)
+        const w = pos.x2 - pos.x1;
+        const h = pos.y2 - pos.y1
+        renderCtx.fillStyle = color;
+        renderCtx.font = "600 " + size.toString() + "px 'Open Sans'";
+        let mWidth = renderCtx.measureText(text).width
+        if (size > h) {
+            size *= h / size;
+        }
+        if (mWidth > w) {
+            const ratio = w/mWidth;
+            size *= ratio;
+        }
+        renderCtx.font = "600 " + size.toString() + "px 'Open Sans'";
+        mWidth = renderCtx.measureText(text).width
+        const lOffset = left ? 0 : (w/2 - mWidth/2)
+        renderCtx.fillText(text, pos.x1 + lOffset, pos.y1 + h/2 + size*.4);
+        return 0;
     }
 
     function loadScript(name) {
@@ -193,11 +298,9 @@ require(['vs/editor/editor.main'], function() {
     const cachedNames = [
         "./lua/5.3/lib.lua",
         "./lua/5.3/gravyui/node.lua",
-        "./lua/5.3/gravyui/plugins/cols.lua",
-        "./lua/5.3/gravyui/plugins/grid.lua",
-        "./lua/5.3/gravyui/plugins/offset.lua",
-        "./lua/5.3/gravyui/plugins/rows.lua",
-        "./lua/5.3/gravyui/plugins/pad.lua"
+        "./lua/5.3/gravyui/plugins/splitting.lua",
+        "./lua/5.3/gravyui/plugins/resizing.lua",
+        "./lua/5.3/gravyui/plugins/translating.lua",
     ]
     const cachedResults = [];
     const promises = [];

@@ -10,17 +10,39 @@ local exampleSize = 100
     namespace and it will be available
     on every node. The first parameter
     is always the node being manipulated.
+
+    In the following example we create
+    a simple helper to make two rows,
+    and a more complex example to create
+    a radial menu around those.
+]]
+
+function main() 
+    local node = Node(exampleSize, exampleSize):offset(x/2 - exampleSize/2, y/2 - exampleSize/2)
+
+    local row = {node:tworows()}
+    
+    DrawRect(row[1], "white")
+    DrawRect(row[2], "red")
+
+    DrawRects("blue", node:resize(20, 20):orbit(1, 10))
+    DrawRects("green", node:resize(10, 10):orbit(1.5, 15))
+    DrawRects("yellow", node:resize(5, 5):orbit(2, 20))
+    
+end
+
+
+--[[
+    A simple extension.
 ]]
 function GravyUINode.tworows(node)
     return node:rows(2)
 end
 
-local node = Node(exampleSize, exampleSize):offset(x/2 - exampleSize/2, y/2 - exampleSize/2)
-local row = {node:tworows()}
-Display(row[1], "green")
-Display(row[2], "red")
 
 --[[ 
+    A more complex extension.
+
     Nodes also contain references to
     their parents, and any existing
     children.
@@ -29,32 +51,15 @@ Display(row[2], "red")
     complex patterns when latered
     together.
 ]]
-function GravyUINode.orbit(node, distanceRatio, count, shift)
+function GravyUINode:orbit(distanceRatio, count, shift)
     local nodes = {};
     local angleEach = 2 * math.pi / count
     for i=1,count do
         local angle = angleEach * (i - 1)
         if shift then angle = angle + shift end
-        local xs = distanceRatio * node.parentNode.rect.width * math.sin(angle)
-        local ys = distanceRatio * node.parentNode.rect.height * math.cos(angle)
-        table.insert(nodes, node:offset(xs, ys))
+        local xs = distanceRatio * self.parentNode.rect.width
+        local ys = distanceRatio * self.parentNode.rect.height
+        table.insert(nodes, self:radial(angle, xs, ys))
     end
     return unpack(nodes)
-end
-
-local orbitTestRoot = Node(exampleSize, exampleSize):offset(x/2 - exampleSize/2, y/2 - exampleSize/2)
-
-local orbitNodes = {orbitTestRoot:pad(exampleSize*.4):orbit(1, 9)}
-for _,orbitNode in ipairs(orbitNodes) do
-    Display(orbitNode, "blue")
-end
-
-local orbitNodes = {orbitTestRoot:pad(exampleSize*.4):orbit(1.5, 14)}
-for _,orbitNode in ipairs(orbitNodes) do
-    Display(orbitNode, "yellow")
-end
-
-local orbitNodes = {orbitTestRoot:pad(exampleSize*.4):orbit(2, 20)}
-for _,orbitNode in ipairs(orbitNodes) do
-    Display(orbitNode, "magenta")
 end

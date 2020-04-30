@@ -1,30 +1,49 @@
 require 'lib'
 local Node = include("gravyui/node")
 local x, y = getResolution()
+local w, h = 250, 200
 
 --[[
     A fun little example of outside
-    the box thinking.
+    the box thinking, uaing many of
+    the features of GravyUI
 ]]
-
-local w, h = 200, 200
-local face = Node(w, h):offset(x/2 - w/2, y/2 - h/2)
-local eyes, nose, mouth = face:pad(20, 40):rows({1/6, 2/3, 1/6}, 10)
-eyes = {eyes:pad(1/8, 0):cols(2, 1/2)}
-nose = nose:pad(2/5, 10)
-mouthRows = {mouth:rows({1/4,1/2,1/4})}
-teeth = {mouthRows[2]:grid(2, 10)}
-
-Display(face, "yellow")
-Display(eyes[1], "white")
-Display(eyes[1]:pad(7), "blue")
-Display(eyes[2], "white")
-Display(eyes[2]:pad(7), "blue")
-Display(nose, "orange")
-Display(mouthRows[1], "red")
-for r=1,#teeth do
-    for c=1,#teeth[r] do
-        Display(teeth[r][c])
-    end
+function main()
+    local face = Node(w, h):offset(x/2 - w/2, y/2 - h/2)
+    local eyes, nose, mouth = face:pad(20, 40):rows({1/6, 2/3, 1/6}, 10)
+    
+    DrawRect(face, "#FFFF88")
+    drawEyes(eyes)
+    drawNose(nose)
+    drawMouth(mouth)
 end
-Display(mouthRows[3], "red")
+
+function drawEyes(eyes)
+    local distanceBetween = eyes.rect.width * .45
+    local leftEye = eyes:resize(30, 20):offset(-distanceBetween/2, 0)
+    local rightEye = leftEye:offset(distanceBetween, 0)
+    DrawRect(leftEye, "white")
+    DrawRect(leftEye:resize(7, 7):offset(6, 3), "blue")
+    DrawRect(rightEye, "white")
+    DrawRect(rightEye:resize(7, 7):offset(6, 3), "blue")
+
+end
+
+function drawNose(nose)
+    nose = nose:pad(.42, 10)
+    DrawRect(nose, "orange")
+end
+
+function drawMouth(mouth)
+    local topLip, teeth, bottomLip = mouth:scale(.75, 1):rows({1/4,1/2,1/4})
+    teeth = {teeth:grid(2, 24)}
+
+    DrawRect(topLip, "red")
+    for r=1,#teeth do
+        for c=1,#teeth[r] do
+            DrawRect(teeth[r][c])
+        end
+    end
+    DrawRect(bottomLip, "red")
+
+end

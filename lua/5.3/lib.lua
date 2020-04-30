@@ -45,3 +45,22 @@ function unpack(t, i)
       return t[i], unpack(t, i + 1)
     end
   end
+
+  
+
+--[[
+    A helper function for displaying
+    a list of nodes.
+]]
+
+function DrawRects(color, ...)
+    for _, node in ipairs({...}) do
+        DrawRect(node, color)
+    end
+end
+
+function DrawGridRects(color, ...)
+    for _, nodes in ipairs({...}) do
+        DrawRects(color, unpack(nodes))
+    end
+end
