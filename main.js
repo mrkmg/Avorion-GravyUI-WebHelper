@@ -1,12 +1,3 @@
-let defaultText = "";
-
-if ("localStorage" in window ) {
-    const saved = localStorage.getItem("Saved Text")
-    if (saved != "") {
-        defaultText = saved;
-    }
-}
-
 require.config({ paths: { 
     'vs': './monaco/min/vs'
  }});
@@ -19,6 +10,44 @@ require(['vs/editor/editor.main'], function() {
     const dragger = document.getElementById("dragger")
     const leftCol = document.getElementById("leftCol")
     const rightCol = document.getElementById("rightCol")
+    const help = document.getElementById("help")
+    const overlay = document.getElementById("overlay")
+
+
+    let defaultText = "";
+
+    if ("localStorage" in window ) {
+        const saved = localStorage.getItem("Saved Text")
+        if (saved != "") {
+            defaultText = saved;
+        }
+
+        const sawHelp = localStorage.getItem("Saw Help");
+        console.log(sawHelp)
+        if (sawHelp !== "yes") {
+            localStorage.setItem("Saw Help", "yes");
+            getHelp();
+        }
+    }
+    
+    function toggleHelp() {
+        if (help.classList.contains("show")) {
+            hideHelp();
+        } else {
+            getHelp();
+        }
+    }
+    window.toggleHelp = toggleHelp;
+
+    function getHelp() {
+        help.classList.add("show");
+        overlay.classList.add("show");
+    }
+
+    function hideHelp() {
+        help.classList.remove("show");
+        overlay.classList.remove("show");
+    }
 
     // Draggerbar
     let leftWidth = Math.min(800, window.innerWidth / 2);
@@ -41,7 +70,7 @@ require(['vs/editor/editor.main'], function() {
         draggerDownX = null;
         leftWidth = leftCol.clientWidth;
         
-        editor.layout();
+        onResize()
         editor.getDomNode().hidden = false;
         runLua();
     })
@@ -60,9 +89,15 @@ require(['vs/editor/editor.main'], function() {
     let lastPrintOffset = 0;
     let globalFontColor = "black";
 
+    function onResize() {
+        renderEle.width = renderEle.clientWidth;
+        renderEle.height = renderEle.clientHeight;
+        const width = editor.getDomNode().parentElement.parentElement.clientWidth;
+        const height = editor.getDomNode().parentElement.parentElement.clientHeight;
+        editor.layout({width: width, height: height});
+    }
+
     function runLua() {
-        renderEle.width = renderEle.parentElement.clientWidth;
-        renderEle.height = renderEle.parentElement.clientHeight - 10;
         const L = fengari.lauxlib.luaL_newstate();
         const value = editor.getValue();
         if ("localStorage" in window ) {
@@ -89,7 +124,6 @@ require(['vs/editor/editor.main'], function() {
                 globalFontColor = lua.lua_tojsstring(L, -1)
                 lua.lua_pop(L, 1)
             }
-
             lua.lua_getglobal(L, "main")
             if (!lua.lua_isnil(L, -1)) {
                 lua.lua_call(L, 0, 0)
@@ -211,7 +245,7 @@ require(['vs/editor/editor.main'], function() {
         renderCtx.font = "600 " + size.toString() + "px 'Open Sans'";
         mWidth = renderCtx.measureText(text).width
         const lOffset = left ? 0 : (rectWidth/2 - mWidth/2)
-        renderCtx.fillText(text, pos.x1 + lOffset, pos.y1 + rectHeight/2 + size * .35);
+        renderCtx.fillText(text, Math.round(pos.x1 + lOffset), Math.round(pos.y1 + rectHeight/2 + size * .35));
         return 0;
     }
 
@@ -241,9 +275,7 @@ require(['vs/editor/editor.main'], function() {
     });
 
     window.addEventListener("resize", function () {
-        renderEle.width = renderEle.parentElement.clientWidth;
-        renderEle.height = renderEle.parentElement.clientHeight - 2;
-        editor.layout();
+        onResize()
         runLua()
     });
 
@@ -270,6 +302,7 @@ require(['vs/editor/editor.main'], function() {
             loadScript("orderbook.lua")
         }
 
+        onResize()
         runLua()
     });
 

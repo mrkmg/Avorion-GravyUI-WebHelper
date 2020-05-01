@@ -41,7 +41,7 @@ function drawMouth(mouth)
     DrawRect(topLip, "red")
     for r=1,#teeth do
         for c=1,#teeth[r] do
-            DrawRect(teeth[r][c])
+            DrawRect(teeth[r][c], "white")
         end
     end
     DrawRect(bottomLip, "red")

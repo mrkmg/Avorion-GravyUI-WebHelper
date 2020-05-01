@@ -48,7 +48,7 @@ end
     children.
 
     This can can allow for some cool,
-    complex patterns when latered
+    complex patterns when layered
     together.
 ]]
 function GravyUINode:orbit(distanceRatio, count, shift)

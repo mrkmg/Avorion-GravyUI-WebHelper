@@ -3,6 +3,7 @@ body{
     margin: 0;
     height: 100vh;
     width: 100vw;
+    font-family: "Open Sans";
 }
 
 #layout {
@@ -30,7 +31,7 @@ body{
 }
 
 #input {
-    height: 100vh;
+    height: 100%;
 }
 
 #dragger {
@@ -42,4 +43,50 @@ body{
 .allower {
     overflow: hidden;
     min-height: 100%;
+}
+
+#help {
+    display: none;
+    position: fixed;
+    vertical-align: middle;
+    width: 400px;
+    height: 400px;
+    top: 50%;
+    left: 50%;
+    margin-left: -200px;
+    margin-top: -200px;
+    background: #eeeeee;
+    border: solid 2px grey;
+}
+
+#help.show {
+    display: block;
+}
+
+#help .close {
+    background: #eeeeee;
+    border: solid 2px grey;
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    cursor: pointer;
+}
+
+.help-body {
+    height: 360px;
+    padding: 20px;
+    overflow: auto;
+}
+
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.5);
+}
+#overlay.show {
+    display: block;
 }

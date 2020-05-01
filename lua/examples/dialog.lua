@@ -19,7 +19,7 @@ function main()
 
     DrawRect(window, "white")
     DrawText(title, "Title", 40)
-    DrawText(body, "There is where the body would go.", 14)
+    DrawText(body, "This is where the body would go.")
     DrawRect(buttons[1], "#A00")
     DrawText(buttons[1], "Cancel", "white")
     DrawRect(buttons[2], "#070")

@@ -7,43 +7,86 @@
     <body>
         <table id="layout">
             <tr>
-                <td id="leftCol" style="height: 100%;" rowspan="3">
+                <td colspan="3" style="height: 30px; border-bottom: solid grey 1px">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 150px">Load a Script:</td>
+                            <td style="width: 150px">
+                                <select id="selector">
+                                    <option value=""></option>
+                                    <option value="showcase.lua">Showcase</option>
+                                    <option value="orderbook.lua">OrderBook</option>
+                                    <option value="windmill.lua">Windmill</option>
+                                    <option value="dialog.lua">Dialog</option>
+                                    <option value="extending.lua">Extending</option>
+                                    <option value="face.lua">Face</option>
+                                </select>
+                            </td>
+                            <td style="text-align: center; font-weight: bold;">GravyUI Layout Playground</td>
+                            <td style="width: 300px; text-align: right;"><button onclick="javascript:toggleHelp()">Help!</button></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftCol">
                     <div class="allower">
                         <div id="input"></div>
                     </div>
                 </td>
-                <td id="dragger" rowspan="3"></td>
-                <td id="rightCol" >
+                <td id="dragger"></td>
+                <td id="rightCol">
                     <canvas id="render"></canvas>
                 </td>
             </tr>
-            <tr>
-                <td style="height: 30px;">
-                    <select id="selector">
-                        <option value="showcase.lua">Showcase</option>
-                        <option value="orderbook.lua">OrderBook</option>
-                        <option value="windmill.lua">Windmill</option>
-                        <option value="dialog.lua">Dialog</option>
-                        <option value="extending.lua">Extending</option>
-                        <option value="face.lua">Face</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td style="height: 100px">
-                    <h3>GravyUI - Playground</h3>
-                    <p>
-                        This tool can assist you in developing
-                        a layout using GravyUI. You can choose
-                        from the dropdown of examples, or write
-                        your own. Everything is rendered as you
-                        type! Docs for how to use GravyUI are at:
-                        <a href="https://github.com/mrkmg/AvorionMods/tree/master/GravyUI">GitHub</a>
-                    </p>
-                    <p>Made by Kevin Gravier (Gravy) in 2020 under the MIT license with love ♥</p>
-                </td>
-            </tr>
         </table>
+        <div id="overlay"></div>
+        <div id="help">
+            <div class="close" onclick="javascript:toggleHelp()">❌</div>
+            <div class="help-body">
+                <h1>GravyUI Layout Playground</h1>
+                <p>
+                    <strong>What is this?</strong> It's a tool to assist you in developing a layout using GravyUI. Docs for how to use GravyUI are at:
+                    <a href="https://github.com/mrkmg/AvorionMods/tree/master/GravyUI">GitHub</a>
+                </p>
+                <p>
+                    <strong>What is GravyUI?</strong> A layout generating library compatible with and made for modding in Avorion.
+                </p>
+                <p>
+                    <strong>How does this work?</strong> To the left is an editor. As you type, the lua is interpreted, and its result is drawn to the right.
+                    This is a full lua environment with some mocked Avorion types (vec2, rect) and a few functions to render in the browser.
+                </p>
+                <p>
+                    Place all draw commands in a "main"
+                    function. While this isn't needed, it
+                    helps with loading order and to keep
+                    your work tidy.
+                </p>
+
+                <p>Use the "Load a Script" at the top to see some examples.</p>
+    
+                <h2>Built in functions</h2>
+    
+<pre>
+x, y = getResolution()
+DrawRect(node[, color])
+DrawRects(color, node, node, ...)
+DrawText(node, text[, color[, size]])
+DrawTextL(node, text[, color[, size]])
+Rect(vec2, vec2)
+vec2(x, y)
+</pre>
+
+                <h2>Globals</h2>
+
+<pre>
+FONTCOLOR = 'black' -- Default font color
+</pre>
+
+                <p>Made by Kevin Gravier (Gravy) in 2020 under the MIT license with love ♥</p>
+
+            </div>
+        </div>
         <script src="./fengari-web.js" type="text/javascript"></script>
         <script src="./monaco/min/vs/loader.js" type="text/javascript"></script>
         <script src="./main.js" type="text/javascript"></script>
