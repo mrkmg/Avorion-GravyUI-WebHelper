@@ -24,9 +24,4 @@ function main()
     DrawText(buttons[1], "Cancel", "white")
     DrawRect(buttons[2], "#070")
     DrawText(buttons[2], "Continue", "white")
-
-    -- Display("Title", title, "red")
-    -- Display("Body", body, "green")
-    -- Display("Cancel", buttons[1], "orange")
-    -- Display("Continue", buttons[2], "orange")
 end

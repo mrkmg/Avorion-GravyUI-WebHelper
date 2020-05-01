@@ -99,10 +99,7 @@ require(['vs/editor/editor.main'], function() {
 
     function runLua() {
         const L = fengari.lauxlib.luaL_newstate();
-        const value = editor.getValue();
-        if ("localStorage" in window ) {
-            localStorage.setItem("Saved Text", value)
-        }        
+        const value = editor.getValue();     
         const luaCode = fengari.to_luastring(value);
 
         fengari.lualib.luaL_openlibs(L);
@@ -129,6 +126,10 @@ require(['vs/editor/editor.main'], function() {
                 lua.lua_call(L, 0, 0)
             }
             lua.lua_close(L)
+            
+            if ("localStorage" in window ) {
+                localStorage.setItem("Saved Text", value)
+            }   
         } catch (e) {
             renderCtx.clearRect(0, 0, renderEle.width, renderEle.height);
             renderCtx.fillStyle = 'red';
@@ -271,7 +272,7 @@ require(['vs/editor/editor.main'], function() {
     let debounceTimeout;
     editor.onKeyUp(() => {
             clearTimeout(debounceTimeout);
-            setTimeout(runLua, 400);
+            setTimeout(runLua, 900);
     });
 
     window.addEventListener("resize", function () {
