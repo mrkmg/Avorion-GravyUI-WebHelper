@@ -90,10 +90,10 @@ require(['vs/editor/editor.main'], function() {
     let globalFontColor = "black";
 
     function onResize() {
-        renderEle.width = renderEle.clientWidth;
-        renderEle.height = renderEle.clientHeight;
-        const width = editor.getDomNode().parentElement.parentElement.clientWidth;
-        const height = editor.getDomNode().parentElement.parentElement.clientHeight;
+        renderEle.width = renderEle.parentElement.clientWidth;
+        renderEle.height = renderEle.parentElement.clientHeight;
+        const width = editor.getDomNode().parentElement.parentElement.parentElement.clientWidth;
+        const height = editor.getDomNode().parentElement.parentElement.parentElement.clientHeight;
         editor.layout({width: width, height: height});
     }
 
@@ -291,7 +291,7 @@ require(['vs/editor/editor.main'], function() {
     const promises = [];
     cachedNames.forEach((name, index) => {
         promises.push(
-            fetch(name).then(r => r.text()).then(r => cachedResults[index] = r)
+            fetch(name + "?2").then(r => r.text()).then(r => cachedResults[index] = r)
         )
     });
 
