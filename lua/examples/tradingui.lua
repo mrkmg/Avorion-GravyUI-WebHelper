@@ -12,20 +12,28 @@ function main()
     local w, h = 800, 600
     local x, y = getResolution()
 
+    -- Create all the nodes
     local window = Node(w, h):offset(x/2 - w/2, y/2 - h/2)
     local table, _, footer = window:pad(10):rows({1, 20, 20})
     local colSizes = {i1, i3, i3, i3, i6, i3, i1, i3, i3, i3, i6, i3, i1}
     local tableGrid = {table:grid(rows + 1, colSizes, 7, 10)}
 
+    -- Draw the nodes
     DrawRect(window, bgColor)
     DrawHeader(tableGrid[1])
     for i=2,rows+1 do
         DrawRow(tableGrid[i])
     end
     DrawFooter(footer:makePaging())
-
 end
 
+--[[
+    An extension to make a pager.
+
+    This splits the node into the columns,
+    then the splits the middle into a 
+    more columns for page buttons.
+]]
 function GravyUINode:makePaging()
     local pagesWidth = self.rect.width - 150
     local pagesCols = math.floor(pagesWidth / self.rect.height/3)
@@ -34,8 +42,6 @@ function GravyUINode:makePaging()
     pages = {pages:cols(pagesCols, pagesMargin)}
     return prev, pages, next
 end
-
-
 
 --[[
     Draw Functions

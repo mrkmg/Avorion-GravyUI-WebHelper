@@ -18,6 +18,10 @@ body{
     border-spacing: 0;
 }
 
+#rightCol {
+    overflow: hidden;
+}
+
 #render {
     background: black;
     image-rendering: pixelated;

@@ -10,8 +10,8 @@
                 <td colspan="3" style="height: 30px; border-bottom: solid grey 1px">
                     <table style="width: 100%;">
                         <tr>
-                            <td style="width: 150px">Load a Script:</td>
-                            <td style="width: 150px">
+                            <td style="width: 120px">Load a Script:</td>
+                            <td style="width: 120px">
                                 <select id="selector">
                                     <option value=""></option>
                                     <option value="showcase.lua?1">Showcase</option>
@@ -23,6 +23,8 @@
                                     <option value="tradingui.lua?1">Trading Routes</option>
                                 </select>
                             </td>
+                            <td style="width: 120px;">Save Name:</td>
+                            <td style="width: 120px;"><input id="savename" /></td>
                             <td style="text-align: center; font-weight: bold;">GravyUI Layout Playground</td>
                             <td style="width: 300px; text-align: right;"><button onclick="javascript:toggleHelp()">Help!</button></td>
                         </tr>
@@ -88,8 +90,13 @@ FONTCOLOR = 'black' -- Default font color
 
             </div>
         </div>
-        <script src="./fengari-web.js" type="text/javascript"></script>
-        <script src="./monaco/min/vs/loader.js" type="text/javascript"></script>
-        <script src="./main.js?2" type="text/javascript"></script>
+        <script src="vendor/fengari-web.js" type="text/javascript"></script>
+        <script src="./vendor/monaco/min/vs/loader.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            require.config({ paths: {
+                'vs': 'vendor/monaco/min/vs'
+            }, basePath: "./"});
+            require(["js/main"], () => 0)
+        </script>
     </body>
 </html>
