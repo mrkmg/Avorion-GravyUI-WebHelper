@@ -10,22 +10,28 @@ define([
         L = null;
         globalFontColor = "black";
         lastPrintOffset = 0;
-        currentFrame = 1;
+        startTime = 0;
         continueLoop = true;
-        startTime = null;
+        maxRunTime = 30000;
 
         run(script) {
-            this.init();
-            this.registerFunctions();
-            try {
-                this.loadScript(script);
-                this.parseGlobals();
-            } catch (e) {
-                console.error(e);
-                throw e;
-            }
+            return new Promise((successCallback, errorCallback) => {
+                try {
+                    this.init();
+                    this.registerFunctions();
+                    renderSystem.clear();
+                    this.loadScript(script);
+                    this.parseGlobals();
+                } catch (e) {
+                    console.error(e);
+                    this.renderError(e)
+                    errorCallback(e);
+                    return;
+                }
 
-            requestAnimationFrame(() => this.runMain())
+                this.startTime = Date.now();
+                requestAnimationFrame(() => this.runMain(successCallback, errorCallback))
+            });
         }
 
         stop() {
@@ -35,6 +41,8 @@ define([
         init() {
             this.L = lauxlib.luaL_newstate();
             lualib.luaL_openlibs(this.L);
+            lauxlib.luaL_loadstring(this.L,  to_luastring('package.path = "/internal/?.lua"'));
+            lua.lua_call(this.L, 0, -1);
         }
 
         registerFunctions() {
@@ -43,9 +51,14 @@ define([
             lua.lua_register(this.L, "DrawText", () => this.DrawText());
             lua.lua_register(this.L, "DrawTextL", () => this.DrawTextL());
             lua.lua_register(this.L, "DrawRect", () => this.DrawRect());
+
+            // Override print -> sprint
+            lauxlib.luaL_loadstring(this.L,  to_luastring('require "lib"\nfunction print(...) sprint(...) end'));
+            lua.lua_call(this.L, 0, -1);
         }
 
         loadScript(script) {
+            if (script == null) return;
             const luaScript = to_luastring(script);
             lauxlib.luaL_loadstring(this.L, luaScript);
             lua.lua_call(this.L, 0, -1);
@@ -57,34 +70,52 @@ define([
                 this.globalFontColor = lua.lua_tojsstring(this.L, -1)
                 lua.lua_pop(this.L, 1)
             }
+            lua.lua_getglobal(this.L, "RUNTIME")
+            if (!lua.lua_isnil(this.L, -1)) {
+                this.maxRunTime = lua.lua_tonumber(this.L, -1)
+                lua.lua_pop(this.L, 1)
+            }
         }
 
-        runMain() {
+        runMain(successCallback, errorCallback) {
             if (!this.continueLoop) {
                 this.cleanup();
                 return;
             }
             lua.lua_getglobal(this.L, "main")
             if (!lua.lua_isnil(this.L, -1)) {
-                lua.lua_pushnumber(this.L, this.currentFrame++)
+                const timeOffset = Date.now() - this.startTime;
+                lua.lua_pushnumber(this.L, timeOffset)
                 this.lastPrintOffset = 0;
                 renderSystem.clear();
-                try {
-                    lua.lua_call(this.L, 1, 1)
+                const valid = lua.lua_pcall(this.L, 1, 1, 0);
+                if (valid == lua.LUA_OK) {
                     if (!lua.lua_isnil(this.L, -1)) {
                         const t = lua.lua_toboolean(this.L, -1);
                         if(t) {
                             lua.lua_pop(this.L, 1)
-                            requestAnimationFrame(() => this.runMain())
-                            return;
+                            if (timeOffset < this.maxRunTime) {
+                                requestAnimationFrame(() => this.runMain(successCallback, errorCallback))
+                                return;
+                            }
                         }
                     }
-                } catch(e) {
-                    const res = renderSystem.getResolution()
-                    renderSystem.drawText(10, 10, res.x - 20, 30, e.toString(), "red", 20, "left")
+                } else {
+                    const str = lua.lua_tojsstring(this.L, -1)
+                    this.renderError(str)
+                    errorCallback(str);
+                    return;
                 }
-                this.cleanup();
             }
+            this.cleanup();
+            successCallback()
+        }
+
+        renderError(e) {
+            const res = renderSystem.getResolution()
+            renderSystem.drawRect(10, 10, res.x - 20, 30, "black")
+            renderSystem.drawText(10, 10, res.x - 20, 30, e.toString(), "red", 20, "left")
+
         }
 
         cleanup() {

@@ -7,25 +7,38 @@
     <body>
         <table id="layout">
             <tr>
-                <td colspan="3" style="height: 30px; border-bottom: solid grey 1px">
+                <td colspan="3" style="height: 30px; border-bottom: solid grey 2px">
                     <table style="width: 100%;">
                         <tr>
-                            <td style="width: 120px">Load a Script:</td>
-                            <td style="width: 120px">
+                            <td style="width: 120px; white-space: nowrap;">Load a Script:</td>
+                            <td style="width: 200px; white-space: nowrap;">
                                 <select id="selector">
-                                    <option value=""></option>
-                                    <option value="showcase.lua?1">Showcase</option>
-                                    <option value="orderbook.lua?1">OrderBook</option>
-                                    <option value="windmill.lua?1">Windmill</option>
-                                    <option value="dialog.lua?1">Dialog</option>
-                                    <option value="extending.lua?1">Extending</option>
-                                    <option value="face.lua?1">Face</option>
-                                    <option value="tradingui.lua?1">Trading Routes</option>
-                                </select>
+                                    <option value="">[New File]</option>
+                                    <optgroup label="User">
+                                    </optgroup>
+                                    <optgroup label="Examples">
+                                        <option value="examples/showcase.lua">examples/showcase.lua</option>
+                                        <option value="examples/orderbook.lua">examples/orderbook.lua</option>
+                                        <option value="examples/windmill.lua">examples/windmill.lua</option>
+                                        <option value="examples/dialog.lua">examples/dialog.lua</option>
+                                        <option value="examples/extending.lua">examples/extending.lua</option>
+                                        <option value="examples/face.lua">examples/face.lua</option>
+                                        <option value="examples/tradingui.lua">examples/tradingui.lua</option>
+                                    </optgroup>
+                                    <optgroup label="GravyUI Library">
+                                        <option value="gravyui/node.lua">gravyui/node.lua</option>   
+                                        <option value="gravyui/plugins/resizing.lua">gravyui/plugins/resizing.lua</option>
+                                        <option value="gravyui/plugins/splitting.lua">gravyui/plugins/splitting.lua</option>
+                                        <option value="gravyui/plugins/translating.lua">gravyui/plugins/translating.lua</option>
+                                    </optgroup>
+                                 </select>
                             </td>
-                            <td style="width: 120px;">Save Name:</td>
-                            <td style="width: 120px;"><input id="savename" /></td>
-                            <td style="text-align: center; font-weight: bold;">GravyUI Layout Playground</td>
+                            <td><button id="delete">X</button></td>
+                            <td style="white-space: nowrap">Save Name:</td>
+                            <td style="white-space: nowrap;">
+                                user/<input style="width: 80px" id="savename" />.lua
+                            </td>
+                            <td style="width: 100%; text-align: center; font-weight: bold;">GravyUI Layout Playground</td>
                             <td style="width: 300px; text-align: right;"><button onclick="javascript:toggleHelp()">Help!</button></td>
                         </tr>
                     </table>
